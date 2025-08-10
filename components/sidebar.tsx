@@ -26,8 +26,9 @@ export default function Sidebar({ highlight }: SidebarProps) {
   const navLinks = [
     { label: "Portfolio", href: "/" },
     { label: "Analytics", href: "/analytics" },
-    { label: "Alerts", href: "/alerts" },
-    { label: "Settings", href: "/settings" },
+    // { label: "Alerts", href: "/alerts" },
+    // { label: "Settings", href: "/settings" },
+    { label: "Coming Soon", href: "#" },
   ];
 
   const NavItem = ({
