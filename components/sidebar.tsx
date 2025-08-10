@@ -2,9 +2,12 @@
 
 import { Button } from "@/components/ui/button"
 import { Lock, LogOut, Shield, ChevronRight } from "lucide-react"
+import { useAuth } from "@/components/auth-provider"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 import ConnectWallet from "./connect-wallet"
+import PolyavaLogo from "./polyava-logo"
 import { cn } from "@/lib/utils"
 
 interface SidebarProps {
@@ -12,6 +15,14 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ highlight }: SidebarProps) {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const { supabase } = await import("@/lib/supabase");
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
   const navLinks = [
     { label: "Portfolio", href: "/" },
     { label: "Analytics", href: "/analytics" },
@@ -46,8 +57,13 @@ export default function Sidebar({ highlight }: SidebarProps) {
 
   return (
     <aside className="hidden md:flex md:flex-col md:gap-6 md:border-r md:border-white/5 md:bg-[#0B0B0F] md:px-4 md:py-6 md:w-[260px] md:min-w-[260px] md:max-w-[260px] md:overflow-hidden">
-      {/* Top rounded placeholder */}
-      <div className="rounded-xl bg-zinc-800/70 h-20 w-full" aria-label="Workspace placeholder" />
+      {/* Polyava Logo */}
+      <div className="flex items-center justify-center h-20 w-full">
+        {/* POLYAVA logo with AVA coin as the 'O' */}
+        <div className="scale-110">
+          <PolyavaLogo />
+        </div>
+      </div>
 
       <nav className="mt-4 flex flex-1 flex-col gap-2">
         {navLinks.map((item) => (
@@ -77,7 +93,10 @@ export default function Sidebar({ highlight }: SidebarProps) {
       <ConnectWallet />
 
       <div className="mt-4">
-        <Button className="flex w-full items-center justify-between rounded-xl bg-[#2D3562] px-4 py-6 text-white hover:bg-[#2b3157]">
+        <Button
+          className="flex w-full items-center justify-between rounded-xl bg-[#2D3562] px-4 py-6 text-white hover:bg-[#2b3157]"
+          onClick={handleLogout}
+        >
           <span className="font-medium">Logout</span>
           <LogOut className="h-4 w-4" />
         </Button>

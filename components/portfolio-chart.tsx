@@ -1,7 +1,7 @@
 "use client"
 
+import React, { useMemo } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { useMemo } from "react"
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 
 export default function PortfolioChart() {
@@ -34,7 +34,7 @@ export default function PortfolioChart() {
   return (
     <Card className="border-white/5 bg-[#141419]">
       <CardContent className="p-8">
-  <h3 className="text-2xl font-semibold mb-4 text-white">Overall Portfolio Value</h3>
+        <h3 className="text-2xl font-semibold mb-4 text-white">Overall Portfolio Value</h3>
         <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
