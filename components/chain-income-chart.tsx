@@ -11,7 +11,9 @@ const chainColors: Record<string, string> = {
   'Subnets': '#2ED573',
 };
 
-export default function ChainIncomeChart({ data, chains }: { data: any[]; chains: string[] }) {
+export default function ChainIncomeChart({ data, chains }: { data: unknown; chains: string[] }) {
+  // Type guard for recharts data
+  const safeData = Array.isArray(data) ? data : [];
   return (
     <Card className="border-white/5 bg-[#141419]">
       <CardContent className="p-8">
@@ -19,7 +21,7 @@ export default function ChainIncomeChart({ data, chains }: { data: any[]; chains
         <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
-              data={data}
+              data={safeData}
               margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
             >
               <XAxis
@@ -57,7 +59,6 @@ export default function ChainIncomeChart({ data, chains }: { data: any[]; chains
                   dataKey={chain}
                   stroke={chainColors[chain] || '#EA5C5C'}
                   strokeWidth={2.5}
-                  dot={false}
                 />
               ))}
             </LineChart>

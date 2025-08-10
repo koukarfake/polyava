@@ -1,23 +1,19 @@
 "use client"
 
+import React from "react";
+
 import { Button } from "@/components/ui/button"
 import { Lock, LogOut, Shield, ChevronRight } from "lucide-react"
-import { useAuth } from "@/components/auth-provider"
+//
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 import ConnectWallet from "./connect-wallet"
-import PolyavaLogo from "./polyava-logo"
 import { cn } from "@/lib/utils"
+import PolyavaLogo from "./polyava-logo";
 
-interface SidebarProps {
-  highlight?: string;
-}
-
-export default function Sidebar({ highlight }: SidebarProps) {
-  const { user } = useAuth();
+export default function Sidebar({ highlight }: { highlight?: string }) {
   const router = useRouter();
-
   const handleLogout = async () => {
     const { supabase } = await import("@/lib/supabase");
     await supabase.auth.signOut();
@@ -26,20 +22,10 @@ export default function Sidebar({ highlight }: SidebarProps) {
   const navLinks = [
     { label: "Portfolio", href: "/" },
     { label: "Analytics", href: "/analytics" },
-    // { label: "Alerts", href: "/alerts" },
-    // { label: "Settings", href: "/settings" },
-    { label: "Coming Soon", href: "#" },
+    { label: "Alerts", href: "/alerts" },
+    { label: "Settings", href: "/settings" },
   ];
-
-  const NavItem = ({
-    label,
-    href,
-    active = false,
-  }: {
-    label: string;
-    href: string;
-    active?: boolean;
-  }) => (
+  const NavItem = ({ label, href, active = false }: { label: string; href: string; active?: boolean }) => (
     <Link href={href} passHref legacyBehavior>
       <Button
         asChild
@@ -55,17 +41,14 @@ export default function Sidebar({ highlight }: SidebarProps) {
       </Button>
     </Link>
   );
-
   return (
     <aside className="hidden md:flex md:flex-col md:gap-6 md:border-r md:border-white/5 md:bg-[#0B0B0F] md:px-4 md:py-6 md:w-[260px] md:min-w-[260px] md:max-w-[260px] md:overflow-hidden">
       {/* Polyava Logo */}
       <div className="flex items-center justify-center h-20 w-full">
-        {/* POLYAVA logo with AVA coin as the 'O' */}
         <div className="scale-110">
           <PolyavaLogo />
         </div>
       </div>
-
       <nav className="mt-4 flex flex-1 flex-col gap-2">
         {navLinks.map((item) => (
           <NavItem
@@ -75,11 +58,11 @@ export default function Sidebar({ highlight }: SidebarProps) {
             active={highlight ? item.label === highlight : item.label === "Portfolio"}
           />
         ))}
-
         <div className="mt-8 rounded-xl border border-[#3C47A0] bg-transparent p-3">
           <Button
             variant="ghost"
             className="flex w-full items-center justify-between rounded-lg px-4 py-6 text-zinc-100 hover:bg-transparent"
+            onClick={() => router.push("/secure-share")}
           >
             <span className="flex items-center gap-3">
               <Lock className="h-5 w-5 text-[#7EA6FF]" />
@@ -89,10 +72,8 @@ export default function Sidebar({ highlight }: SidebarProps) {
           </Button>
         </div>
       </nav>
-
       {/* Connect Wallet button just before logout */}
       <ConnectWallet />
-
       <div className="mt-4">
         <Button
           className="flex w-full items-center justify-between rounded-xl bg-[#2D3562] px-4 py-6 text-white hover:bg-[#2b3157]"
@@ -102,12 +83,11 @@ export default function Sidebar({ highlight }: SidebarProps) {
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
-
       <div className="sr-only">
         <Link href="#" aria-label="Secure Share">
           <Shield className="h-4 w-4" />
         </Link>
       </div>
     </aside>
-  )
+  );
 }

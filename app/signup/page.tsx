@@ -28,18 +28,26 @@ export default function SignupPage() {
   const handleMetaMaskSignup = async () => {
     setError(null);
     setSuccess(null);
-    if (!(window as any).ethereum) {
+    interface EthereumProvider {
+      request: (args: { method: string }) => Promise<string[]>;
+    }
+    const eth = (window as { ethereum?: EthereumProvider }).ethereum;
+    if (!eth) {
       setError("MetaMask is not installed.");
       return;
     }
     setLoading(true);
     try {
-      const accounts = await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = await eth.request({ method: 'eth_requestAccounts' });
       const address = accounts[0];
       setSuccess(`Wallet connected: ${address}`);
       // Here you would send the address to your backend or Supabase for registration
-    } catch (err: any) {
-      setError(err.message || "Failed to connect wallet.");
+    } catch (err) {
+      if (typeof err === 'object' && err && 'message' in err) {
+        setError((err as { message?: string }).message || "Failed to connect wallet.");
+      } else {
+        setError("Failed to connect wallet.");
+      }
     }
     setLoading(false);
   };

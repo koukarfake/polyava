@@ -10,29 +10,15 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 
-export default function BalanceCard({
-  token = "AVAX",
-  amount = 48.567,
-}: {
-  token?: string
-  amount?: number
-}) {
+export default function BalanceCard({ amount = 48.567 }: { amount?: number }) {
   const [selectedToken, setSelectedToken] = React.useState("AVAX");
-  // Map token value to display name and image
   const tokenMap: Record<string, { name: string; image: string }> = {
     AVAX: { name: "AVAX", image: "/Coin.png" },
     token1: { name: "USDC", image: "/usdc.webp" },
     token2: { name: "BNB", image: "/bnb.webp" },
   };
-  // Track previous token for animation direction
   const prevToken = React.useRef(selectedToken);
-  const [direction, setDirection] = React.useState(0); // 1 for right, -1 for left
-
   const handleTabChange = (val: string) => {
-    const order = ["AVAX", "token1", "token2"];
-    const prevIdx = order.indexOf(selectedToken);
-    const nextIdx = order.indexOf(val);
-    setDirection(nextIdx > prevIdx ? 1 : -1);
     prevToken.current = selectedToken;
     setSelectedToken(val);
   };

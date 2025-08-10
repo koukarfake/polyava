@@ -9,15 +9,23 @@ export default function ConnectWallet() {
 
   const connectWallet = async () => {
     setError(null);
-    if (typeof window === "undefined" || !(window as any).ethereum) {
+    interface EthereumProvider {
+      request: (args: { method: string }) => Promise<string[]>;
+    }
+    const eth = (window as { ethereum?: EthereumProvider }).ethereum;
+    if (typeof window === "undefined" || !eth) {
       setError("MetaMask is not installed");
       return;
     }
     try {
-      const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+      const accounts = await eth.request({ method: "eth_requestAccounts" });
       setAccount(accounts[0]);
-    } catch (err: any) {
-      setError(err.message || "Failed to connect");
+    } catch (err) {
+      if (typeof err === 'object' && err && 'message' in err) {
+        setError((err as { message?: string }).message || "Failed to connect");
+      } else {
+        setError("Failed to connect");
+      }
     }
   };
 

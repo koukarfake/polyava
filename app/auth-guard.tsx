@@ -11,9 +11,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function checkWallet() {
-      if (typeof window !== "undefined" && (window as any).ethereum) {
+      if (typeof window !== "undefined" && window.ethereum) {
         try {
-          const accounts = await (window as any).ethereum.request({ method: 'eth_accounts' });
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
           setWalletConnected(accounts && accounts.length > 0);
         } catch {
           setWalletConnected(false);
@@ -23,10 +23,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     }
     checkWallet();
-    if ((window as any).ethereum && (window as any).ethereum.on) {
-      (window as any).ethereum.on('accountsChanged', checkWallet);
+    if (typeof window !== "undefined" && window.ethereum && window.ethereum.on) {
+      window.ethereum.on('accountsChanged', checkWallet);
       return () => {
-        (window as any).ethereum.removeListener('accountsChanged', checkWallet);
+        window.ethereum?.removeListener?.('accountsChanged', checkWallet);
       };
     }
   }, []);

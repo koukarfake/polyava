@@ -5,7 +5,6 @@ import Sidebar from "@/components/sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, DollarSign, Activity } from "lucide-react"
-import PortfolioChart from "@/components/portfolio-chart"
 import ChainIncomeChart from "@/components/chain-income-chart"
 import { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -78,13 +77,11 @@ export default function Analytics() {
   }, []);
 
   // Chain income chart data
-  // Always show these chains
-  const defaultChains = ['C Chain', 'P Chain', 'S Chain', 'Subnets'];
   const { chainChartData, chainList } = useMemo(() => {
+    const defaultChains = ['C Chain', 'P Chain', 'S Chain', 'Subnets'];
     // If no transactions, show mock data for all chains
     if (!transactions.length) {
       const dayCount = 30;
-      // Make C Chain (Avalanche) start at $15,000, others more realistic
       let c = 15000, p = 8000, s = 6000, sub = 4000;
       const data = [];
       for (let i = dayCount; i >= 0; i--) {
@@ -107,7 +104,6 @@ export default function Analytics() {
     }
     // Otherwise, aggregate real data
     const chains = Array.from(new Set(transactions.map(t => t.network)));
-    // Ensure all default chains are present in the legend
     defaultChains.forEach(chain => { if (!chains.includes(chain)) chains.push(chain); });
     const days = Array.from({ length: 30 }, (_, i) => {
       const d = new Date();
@@ -115,7 +111,7 @@ export default function Analytics() {
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     });
     const chartData = days.map(date => {
-      const entry: any = { date };
+      const entry: Record<string, number|string> = { date };
       chains.forEach(chain => {
         const sum = transactions
           .filter(t => t.network === chain && new Date(t.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) === date)
@@ -194,8 +190,8 @@ export default function Analytics() {
                     <AnimatePresence>
                       {transactions.map((tx) => {
                         // Guess type from status or fallback
-                        let type = tx.type || (tx.status === "Active" ? "Stake" : "Buy");
-                        let typeColor =
+                        const type = tx.type || (tx.status === "Active" ? "Stake" : "Buy");
+                        const typeColor =
                           type === "Buy"
                             ? "bg-green-500/20 text-green-400"
                             : type === "Sell"

@@ -1,6 +1,8 @@
 "use client";
 
+
 import Sidebar from "@/components/sidebar";
+import Link from "next/link";
 
 export default function DashboardPage() {
   return (
@@ -11,12 +13,14 @@ export default function DashboardPage() {
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-white">Welcome to Polyava Dashboard</h1>
             <p className="text-gray-400">Your main dashboard overview</p>
-            <a
-              href="/secure-share"
-              className="inline-block mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-semibold shadow"
-            >
-              Secure Send
-            </a>
+            <Link href="/secure-share" passHref legacyBehavior>
+              <button
+                className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-semibold shadow"
+                type="button"
+              >
+                Secure Send
+              </button>
+            </Link>
           </div>
         </div>
       </div>
