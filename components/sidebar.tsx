@@ -15,6 +15,10 @@ import PolyavaLogo from "./polyava-logo";
 export default function Sidebar({ highlight }: { highlight?: string }) {
   const router = useRouter();
   const handleLogout = async () => {
+    // Clear MetaMask account from cache
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("polyava_metamask_account");
+    }
     const { supabase } = await import("@/lib/supabase");
     await supabase.auth.signOut();
     router.push("/login");
@@ -42,7 +46,7 @@ export default function Sidebar({ highlight }: { highlight?: string }) {
     </Link>
   );
   return (
-    <aside className="hidden md:flex md:flex-col md:gap-6 md:border-r md:border-white/5 md:bg-[#0B0B0F] md:px-4 md:py-6 md:w-[260px] md:min-w-[260px] md:max-w-[260px] md:overflow-hidden">
+    <aside className="hidden md:flex md:flex-col md:gap-6 md:border-r md:border-white/5 md:bg-[#0B0B0F] md:px-4 md:py-6 md:w-[260px] md:min-w-[260px] md:max-w-[260px] md:min-h-screen md:h-screen md:overflow-y-auto md:overflow-x-hidden">
       {/* Polyava Logo */}
       <div className="flex items-center justify-center h-20 w-full">
         <div className="scale-110">

@@ -1,11 +1,39 @@
 "use client"
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+
 
 export default function ConnectWallet() {
   const [account, setAccount] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // On mount, check localStorage for cached account
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem("polyava_metamask_account");
+      if (cached) setAccount(cached);
+    }
+  }, []);
+
+  // Listen for account changes
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && window.ethereum && window.ethereum.on) {
+      const handler = (accounts: unknown) => {
+        if (Array.isArray(accounts) && accounts.length > 0 && typeof accounts[0] === 'string') {
+          setAccount(accounts[0]);
+          localStorage.setItem("polyava_metamask_account", accounts[0]);
+        } else {
+          setAccount(null);
+          localStorage.removeItem("polyava_metamask_account");
+        }
+      };
+      window.ethereum.on("accountsChanged", handler);
+      return () => {
+        window.ethereum?.removeListener?.("accountsChanged", handler);
+      };
+    }
+  }, []);
 
   const connectWallet = async () => {
     setError(null);
@@ -20,6 +48,7 @@ export default function ConnectWallet() {
     try {
       const accounts = await eth.request({ method: "eth_requestAccounts" });
       setAccount(accounts[0]);
+      localStorage.setItem("polyava_metamask_account", accounts[0]);
     } catch (err) {
       if (typeof err === 'object' && err && 'message' in err) {
         setError((err as { message?: string }).message || "Failed to connect");
