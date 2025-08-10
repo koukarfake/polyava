@@ -10,55 +10,58 @@ import dynamic from "next/dynamic";
 // Lazy load BuyTokenButton to avoid SSR issues with window.ethereum
 const BuyTokenButton = dynamic(() => import("@/components/buy-token-button"), { ssr: false });
 
-// Special buy button for AVAX (native coin)
-function BuyAvaxButton() {
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
+  // Special buy button for AVAX (native coin)
+  function BuyAvaxButton() {
+    const [loading, setLoading] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
+    const [success, setSuccess] = React.useState<string | null>(null);
 
-  const handleBuy = async () => {
-    setError(null);
-    setSuccess(null);
-    setLoading(true);
-    try {
-      if (typeof window === "undefined" || !window.ethereum) {
-        setError("MetaMask is not available");
-        setLoading(false);
-        return;
+    const handleBuy = async () => {
+      setError(null);
+      setSuccess(null);
+      setLoading(true);
+      try {
+        if (typeof window === "undefined" || !window.ethereum) {
+          setError("MetaMask is not available");
+          setLoading(false);
+          return;
+        }
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await window.ethereum.request({ method: "eth_accounts" }) as string[];
+        const from = accounts && accounts[0];
+        if (!from) throw new Error("No wallet connected");
+        const tx = await window.ethereum.request({
+          method: "eth_sendTransaction",
+          // @ts-expect-error: MetaMask types are not always up to date
+          params: [
+            {
+              to: from,
+              from,
+              value: "0x2386F26FC10000", // 0.01 AVAX in wei
+            },
+          ],
+        });
+        setSuccess("Transaction sent! Hash: " + tx);
+      } catch (err) {
+        if (err && typeof err === "object" && "message" in err) {
+          setError((err as { message?: string }).message || "Transaction failed");
+        } else {
+          setError("Transaction failed");
+        }
       }
-      // Prompt user to connect wallet if not already
-      await window.ethereum.request({ method: "eth_requestAccounts" });
-      // For demo: send 0.01 AVAX to self (simulate buy)
-      const accounts = await window.ethereum.request({ method: "eth_accounts" });
-      const from = accounts && accounts[0];
-      if (!from) throw new Error("No wallet connected");
-      const tx = await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [
-          {
-            to: from,
-            from,
-            value: "0x2386F26FC10000", // 0.01 AVAX in wei
-          },
-        ],
-      });
-      setSuccess("Transaction sent! Hash: " + tx);
-    } catch (err: any) {
-      setError(err?.message || "Transaction failed");
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    };
 
-  return (
-    <div className="flex flex-col items-end">
-      <button onClick={handleBuy} disabled={loading} className="bg-[#2D3562] text-white hover:bg-[#3C47A0] rounded px-3 py-1 text-sm">
-        {loading ? "Processing..." : `Buy AVAX`}
-      </button>
-      {error && <span className="text-xs text-red-400 mt-1">{error}</span>}
-      {success && <span className="text-xs text-green-400 mt-1">{success}</span>}
-    </div>
-  );
-}
+    return (
+      <div className="flex flex-col items-end">
+        <button onClick={handleBuy} disabled={loading} className="bg-[#2D3562] text-white hover:bg-[#3C47A0] rounded px-3 py-1 text-sm">
+          {loading ? "Processing..." : `Buy AVAX`}
+        </button>
+        {error && <span className="text-xs text-red-400 mt-1">{error}</span>}
+        {success && <span className="text-xs text-green-400 mt-1">{success}</span>}
+      </div>
+    );
+  }
 
 export default function AlertsPage() {
   const [tokens, setTokens] = useState<Array<{ id: string; symbol: string; name: string; image: string; address: string }>>([]);
@@ -132,11 +135,11 @@ export default function AlertsPage() {
                 if (prev !== undefined && price !== undefined) {
                   direction = price > prev ? "up" : price < prev ? "down" : null;
                 }
-                // Use the address field from fetchCChainTokens (valid Avalanche address or empty string)
                 const tokenAddress = token.address || "";
                 return (
                   <li key={token.id} className="p-5 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={token.image} alt={token.name} className="w-8 h-8 rounded-full bg-[#23232b] border border-[#2a2a2a]" />
                       <span className="font-semibold text-white text-lg">{token.name}</span>
                       <span className="ml-2 text-xs text-gray-400">({token.symbol})</span>

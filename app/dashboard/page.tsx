@@ -2,8 +2,6 @@
 
 
 import Sidebar from "@/components/sidebar";
-import Link from "next/link";
-
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen w-full bg-[#1a1a1a]">
