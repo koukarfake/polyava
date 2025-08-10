@@ -36,8 +36,12 @@ export default function BuyTokenButton({ tokenSymbol, tokenAddress }: BuyTokenBu
         ],
       });
       setSuccess("Transaction sent! Hash: " + tx);
-    } catch (err: any) {
-      setError(err?.message || "Transaction failed");
+    } catch (err) {
+      if (err && typeof err === "object" && "message" in err) {
+        setError((err as { message?: string }).message || "Transaction failed");
+      } else {
+        setError("Transaction failed");
+      }
     }
     setLoading(false);
   };

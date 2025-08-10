@@ -98,7 +98,7 @@ export default function AlertsPage() {
           setPrices(data);
           setLastUpdated(new Date().toLocaleTimeString());
         }
-      } catch (e) {
+      } catch {
         if (mounted) setPriceError("Failed to fetch token prices. Please try again later.");
       }
     }

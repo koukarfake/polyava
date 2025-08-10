@@ -1,16 +1,23 @@
 // Fetch all C-Chain compatible ERC20 tokens from CoinGecko (top 50 by market cap)
 // Returns an array of { id, symbol, name, image }
 
+interface CoinMarket {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+}
+
 export async function fetchCChainTokens(): Promise<Array<{ id: string; symbol: string; name: string; image: string; address: string }>> {
   // Get top 50 Avalanche ecosystem tokens
   const url =
     "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=avalanche-ecosystem&order=market_cap_desc&per_page=50&page=1";
   const res = await fetch(url);
   if (!res.ok) return [];
-  const data = await res.json();
+  const data: CoinMarket[] = await res.json();
   // For each token, fetch its contract address on Avalanche
   const tokens = await Promise.all(
-    data.map(async (coin: any) => {
+    data.map(async (coin) => {
       let address = "";
       try {
         const detailRes = await fetch(`https://api.coingecko.com/api/v3/coins/${coin.id}`);
@@ -18,7 +25,9 @@ export async function fetchCChainTokens(): Promise<Array<{ id: string; symbol: s
           const detail = await detailRes.json();
           address = detail.platforms?.avalanche || "";
         }
-      } catch {}
+      } catch {
+        // ignore
+      }
       return {
         id: coin.id,
         symbol: coin.symbol.toUpperCase(),
@@ -48,7 +57,7 @@ export async function fetchTokenPricesByIds(ids: string[]): Promise<Record<strin
           result[id] = data[id].usd;
         }
       }
-    } catch (e) {
+    } catch {
       // Ignore this batch, continue
     }
   }
